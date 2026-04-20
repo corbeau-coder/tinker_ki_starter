@@ -23,7 +23,6 @@ class PingCommand(Command):
         await context.react("👍")
 
 class PigCommand(Command):
-    @triggered()
     async def handle(self, context: Context) -> None:
         logging.info("Pig Command am Stizzle")
         model = WhisperModel("large-v3-turbo", device="cpu")
@@ -33,6 +32,7 @@ class PigCommand(Command):
                 segments, info = model.transcribe(item, language="de")
                 for segment in segments:
                     await context.send(segment.text)
+
 
 #https://deepwiki.com/signalbot-org/signalbot/3.2-commands
 
