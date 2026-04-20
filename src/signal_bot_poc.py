@@ -19,8 +19,9 @@ from signalbot import (
 class PingCommand(Command):
     @triggered("Ping")
     async def handle(self, context: Context) -> None:
-        await context.send("Pong")
+        await context.react("👍")
 
+#https://deepwiki.com/signalbot-org/signalbot/3.2-commands
 
 if __name__ == "__main__":
     enable_console_logging(logging.INFO)
