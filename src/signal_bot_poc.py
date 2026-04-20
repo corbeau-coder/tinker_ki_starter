@@ -25,7 +25,9 @@ class PingCommand(Command):
 class PigCommand(Command):
     @triggered()
     async def handle(self, context: Context) -> None:
+        logging.info("Pig Command am Stizzle")
         model = WhisperModel("large-v3-turbo", device="cpu")
+        logging.info(f"debug ausgabe {context.message.text} und {context.message.attachments_local_filenames}")
         if context.message.text is None and context.message.attachments_local_filenames is not None:
             for item in context.message.attachments_local_filenames:
                 segments, info = model.transcribe(item, language="de")
