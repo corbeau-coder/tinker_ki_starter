@@ -4,6 +4,7 @@
 
 import logging
 import os
+from dotenv import load_dotenv
 
 from signalbot import (
     Command,
@@ -23,6 +24,8 @@ class PingCommand(Command):
 
 if __name__ == "__main__":
     enable_console_logging(logging.INFO)
+
+    load_dotenv()
 
     bot = SignalBot(
         Config(
