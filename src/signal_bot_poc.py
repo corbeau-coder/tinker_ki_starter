@@ -5,6 +5,7 @@
 import logging
 import os
 from dotenv import load_dotenv
+from faster_whisper import WhisperModel
 
 from signalbot import (
     Command,
@@ -21,6 +22,16 @@ class PingCommand(Command):
     async def handle(self, context: Context) -> None:
         await context.react("👍")
 
+class PigCommand(Command):
+    @triggered()
+    async def handle(self, context: Context) -> None:
+        model = WhisperModel("large-v3-turbo", device="cpu")
+        if context.message.text is None and context.message.attachments_local_filenames is not None:
+            for item in context.message.attachments_local_filenames:
+                segments, info = model.transcribe(item, language="de")
+                for segment in segments:
+                    await context.send(segment.text)
+
 #https://deepwiki.com/signalbot-org/signalbot/3.2-commands
 
 if __name__ == "__main__":
@@ -35,4 +46,5 @@ if __name__ == "__main__":
         )
     )
     bot.register(PingCommand())  # Run the command for all contacts and groups
+    bot.register(PigCommand())
     bot.start()
