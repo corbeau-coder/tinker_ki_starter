@@ -33,7 +33,7 @@ class PigCommand(Command):
         # You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
         if context.message.text is None and context.message.attachments_local_filenames is not None:
             for item in context.message.attachments_local_filenames:
-                path = os.environ["attachment_path"]
+                path = os.environ["ATTACHMENT_PATH"]
                 path = path if path.endswith("/") else path + "/"
                 segments, info = self.model.transcribe(path + item, language="de")
                 transcript = ""
@@ -44,9 +44,11 @@ class PigCommand(Command):
                 message = [{"role": "user", "content": transcript}]
                 await self.bot.start_typing(context.message.recipient())
                 try:
-                    async for chunk in await self.asyclient.chat(model="assi1", messages=message, stream=True):
-                        await context.send(chunk.message.content)
-
+                    response = await self.asyclient.chat(model="assi1", messages=message, stream=False)
+                    response_str = response.message.content
+                    while response_str.length > 255:
+                        await context.send(response_str[:255])
+                        response_str = response_str[:255]
                 finally:
                     await self.bot.stop_typing(context.message.recipient())
 
