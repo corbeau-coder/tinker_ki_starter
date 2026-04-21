@@ -6,6 +6,7 @@ import logging
 import os
 from dotenv import load_dotenv
 from faster_whisper import WhisperModel
+from ollama import AsyncClient
 
 from signalbot import (
     Command,
@@ -23,15 +24,32 @@ class PingCommand(Command):
         await context.react("👍")
 
 class PigCommand(Command):
+    def __init__(self):
+        self.model = WhisperModel("large-v3-turbo", device="cpu")
+        self.asyclient = AsyncClient()
+
     async def handle(self, context: Context) -> None:
-        logging.info("Pig Command am Stizzle")
-        model = WhisperModel("large-v3-turbo", device="cpu")
-        logging.info(f"debug ausgabe {context.message.text} und {context.message.attachments_local_filenames}")
+
+        # You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
         if context.message.text is None and context.message.attachments_local_filenames is not None:
             for item in context.message.attachments_local_filenames:
-                segments, info = model.transcribe(item, language="de")
+                path = os.environ["attachment_path"]
+                path = path if path.endswith("/") else path + "/"
+                segments, info = self.model.transcribe(path + item, language="de")
+                transcript = ""
                 for segment in segments:
+                    transcript = transcript + segment.text
                     await context.send(segment.text)
+
+                message = [{"role": "user", "content": transcript}]
+                await self.bot.start_typing(context.message.recipient())
+                try:
+                    async for chunk in await self.asyclient.chat(model="assi1", messages=message, stream=True):
+                        await context.send(chunk.message.content)
+
+                finally:
+                    await self.bot.stop_typing(context.message.recipient())
+
 
 
 #https://deepwiki.com/signalbot-org/signalbot/3.2-commands
