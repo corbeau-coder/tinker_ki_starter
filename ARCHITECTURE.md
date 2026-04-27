@@ -24,17 +24,22 @@ graph LR
 ```mermaid
 graph LR
     A["signalbot
-    Receiving request"]
+    receiving user requests"]
     B["faster.whisper
     Speech to text"]
-    C[agentic system
-    LLM via Ollama]
-    D[signalbot
-    Sending answer]
-    
-    A -->|Audiofile or text via file system| B
-    B -->|Transcript| C
+    C["agentic system
+    LLM via Ollama"]
+    D["orchestrator
+    order queuing, validating"] 
+    E["signalbot
+    transmitting response"]
+        
+    A -->|Audio file via file system or text| D
+    D -.->|Audio file| B
+    B -.->|Transcript| D
+    D -->|transmit request| C
     C -->|Response| D
+    D -->|sending out answer| E
 ```
 
 ### Component diagram agentic system
