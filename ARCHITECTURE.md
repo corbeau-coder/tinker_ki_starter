@@ -1,6 +1,14 @@
 # Architecture concepts
 
-This diagram should give guidance how the app is build. it especially guides the developer himself to find out of rabbits hole again xD
+## Decisions
+
+- [ADR-001](docs/decisions/ADR-001-pipeline-context-object.md) - Pipeline Context Object
+- [ADR-002](docs/decisions/ADR-002-multi-tenant-operation.md) - Multi Tenant Operation
+- [ADR-003](docs/decisions/ADR-003-opentelemetry.md) - OpenTelemetry
+- [ADR-004](docs/decisions/ADR-004-no-langchain-usage.md) - No LangChain
+- [ADR-005](docs/decisions/ADR-005-split-signalbot-up-to-improve-DI.md) - Using DI on signalbot interfacing logic
+- [ADR-006](docs/decisions/ADR-006-GDPR.md) - GDPR is respected
+
 
 ## Diagrams
 
@@ -12,8 +20,8 @@ graph LR
     B["App
     Finds out how to fulfil the request
     "]
-    C["Reports back
-    Either giving info or reporting state"]
+    C["User
+    receiving requested info"]
     
     A -->|send message| B
     B -->|send feedback| C
