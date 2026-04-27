@@ -22,6 +22,7 @@ every checkpoint
 it will add extra work in coding preparation. Extra classes and probably a good bunch of thoughts about what is taking
 a ride through the pipeline.
 it will pay back while testing and debugging it.
+a enum object reflecting the state in the pipeline will be added to that object
 
 ### Date of decision:
 2026-04-23
