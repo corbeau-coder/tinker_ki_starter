@@ -15,13 +15,9 @@
 ### Context diagram
 ```mermaid
 graph LR
-    A["User
-    Sending request per chat"]
-    B["App
-    Finds out how to fulfil the request
-    "]
-    C["User
-    receiving requested info"]
+    A["User <br>Sending request per chat"]
+    B["App <br>Finds out how to fulfil the request"]
+    C["User <br>receiving requested info"]
     
     A -->|send message| B
     B -->|send feedback| C
@@ -31,16 +27,11 @@ graph LR
 ### Container diagram
 ```mermaid
 graph LR
-    A["signalbot
-    receiving user requests"]
-    B["faster.whisper
-    Speech to text"]
-    C["agentic system
-    LLM via Ollama"]
-    D["orchestrator
-    order queuing, validating"] 
-    E["signalbot
-    transmitting response"]
+    A["signalbot <br>receiving user requests"]
+    B["faster.whisper <br>Speech to text"]
+    C["agentic system <br>LLM via Ollama"]
+    D["orchestrator <br>order queuing, validating"] 
+    E["signalbot <br>transmitting response"]
         
     A -->|Audio file via file system or text| D
     D -.->|Audio file| B
@@ -53,34 +44,46 @@ graph LR
 ### Component diagram agentic system
 ```mermaid
 graph LR
-    subgraph agent["Agentic system — Python"]
-        M["miracle
-        "]
+    subgraph agent["Agentic system - Python"]
+        EXT["outside system <br>interface"]
+        
+        A["Orchestrator <br>overwatching pipeline states"]
+        B["Tool Smith <br>generating/maintaining tools"]
+        C["Lexica <br>LLM seeking for the requests solution"]
+        E["tool belt <br>MCP tool collection"]
+        
+        
+        A -->|requesting tool list|B
+        B -->|sending tool list|A
+        A -->|sends request|C
+        C -->|receiving answer, might want to adjust tools and repeat|A
+        B -->|curating tools|E
+        C -->|uses tools|E
+        
+        
+        
         
     end
 ```
 
-### Sequence diagram
 ```mermaid
-sequenceDiagram
-    participant N as Nutzer
-    participant S as Signal
-    participant W as Whisper
-    participant A as Agent
+graph TD
+    J -->|Max loops/token limit reached| H[respond to request]
+    J -->|Exit| H[respond to request]
+    A([receiving request]) -->J{Orchestrator to decide}
+    B[Orchestrator loads tool list into Lexica]
+    B --> C[Lexica is executing request]
+    C -->|Sending result| K[TODO: external evaluation?]
+    %% TODO: external evaluator?
+    K --> J
+    F -->|Yes| G[Tool smith to craft tool]
+    F -->|No| B
+    J -->|Continue looping| F{Tool missing?}
+    G -->|Updates tool list| B
 
-    N->>S: Sprachnachricht
-    S->>W: Audiodatei
-    Note over W: Transkription läuft...
-    W->>A: Transkript
-    Note over A: Agent denkt nach...
-    A->>S: Textantwort
-    S->>N: Antwort via Signal
-
-    rect rgb(250, 220, 220)
-        Note over W,S: Fehlerfall
-        W-->>S: Fehler-Event
-        S->>N: Konnte nicht verarbeiten
-    end
 ```
 
-## Decisions
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+```

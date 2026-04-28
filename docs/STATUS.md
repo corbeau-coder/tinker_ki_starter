@@ -8,4 +8,7 @@ finalize container drawing in ARCHITECTURE.md
 
 ### Blocked:
 
+### Open Questions:
+* how and when to decide whether an additional agent evaluating lexicas result makes sense?
+
 ### Last Session:
