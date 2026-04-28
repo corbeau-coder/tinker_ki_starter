@@ -85,5 +85,12 @@ graph TD
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Idle
+    [*] --> Received : task received
+    Received --> Checking : start loop
+    Checking --> Done : solved, aborted by parameter or error
+    Checking --> ToolsLoading: Loading tools needed
+    ToolsLoading --> GeneratingResult : starting LLM with tools and prompt
+    GeneratingResult --> Checking : checking for abort, exit or next loop
+    Done --> [*] : exit
+
 ```

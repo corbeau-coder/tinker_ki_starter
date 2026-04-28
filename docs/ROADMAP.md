@@ -19,7 +19,7 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 ### Current Milestone: M2
 
 ### Steps
-* [ ] finalize container drawing in ARCHITECTURE.md
+* [x] finalize container drawing in ARCHITECTURE.md
 * [ ] check for fitting model with MCP capability
 * [ ] create OTel environment (set up OTel colletor, LangFuse and Prometheus)
 * [ ] build 5 artifical requests the agents should "solve"

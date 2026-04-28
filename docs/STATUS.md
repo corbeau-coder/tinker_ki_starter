@@ -1,10 +1,9 @@
 ### Now:
-finalize container drawing in ARCHITECTURE.md
+check for fitting model with MCP capability
 
 ### Next:
-* orchestrator layer
-* looping
-* tool-smith placeholder
+* lookup model used
+* find a fitting one (RAM usage, europe, mcp capabilities)
 
 ### Blocked:
 
@@ -12,3 +11,4 @@ finalize container drawing in ARCHITECTURE.md
 * how and when to decide whether an additional agent evaluating lexicas result makes sense?
 
 ### Last Session:
+* created all necessary diagrams for agentic network
