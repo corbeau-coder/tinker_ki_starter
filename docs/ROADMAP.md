@@ -20,8 +20,8 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 
 ### Steps
 * [x] finalize container drawing in ARCHITECTURE.md
-* [ ] check for fitting model with MCP capability
-* [ ] create OTel environment (set up OTel colletor, LangFuse and Prometheus)
+* [x] check for fitting model with MCP capability
+* [ ] create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 * [ ] build 5 artifical requests the agents should "solve"
 * [ ] implement first version including instrumentation
 * [ ] start/debug/analyze first version the 5 requests

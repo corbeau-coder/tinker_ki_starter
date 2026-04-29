@@ -1,9 +1,10 @@
 ### Now:
-check for fitting model with MCP capability
+create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 
 ### Next:
-* lookup model used
-* find a fitting one (RAM usage, europe, mcp capabilities)
+* create docker-compose for otel-con
+* set up langfuse and configure using otel-con
+* set up prometheus and configure using otel-con
 
 ### Blocked:
 
@@ -11,4 +12,5 @@ check for fitting model with MCP capability
 * how and when to decide whether an additional agent evaluating lexicas result makes sense?
 
 ### Last Session:
-* created all necessary diagrams for agentic network
+* lookup model used -> cas/eurollm-1.7b-instruct-q8
+* find a fitting one (RAM usage, europe, mcp capabilities) -> ministral-3:3b 

@@ -1,4 +1,4 @@
-FROM cas/eurollm-1.7b-instruct-q8
+FROM mistral-3/3b
 
 SYSTEM """
 Du erhältst eine Nachricht oder einen Gedanken. Deine Aufgabe ist es, ergänzende Perspektiven,
