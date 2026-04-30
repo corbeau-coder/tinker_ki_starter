@@ -59,7 +59,7 @@ class PigCommand(Command):
 if __name__ == "__main__":
     enable_console_logging(logging.INFO)
 
-    load_dotenv()
+    load_dotenv(Path(__file__).parent.parent / ".env")
 
     bot = SignalBot(
         Config(
