@@ -4,12 +4,12 @@
 
 import logging
 import os
-from asyncio import tools
 
 from dotenv import load_dotenv
 from faster_whisper import WhisperModel
 from ollama import AsyncClient
 from ddgs import DDGS
+from pathlib import Path
 
 from signalbot import (
     Command,
@@ -81,7 +81,7 @@ class PigCommand(Command):
         result = DDGS().text(query, region="de-de", max_results=5)
 
         return "\n\n".join(
-            f"Titel: {r['title']}\nURL: {r['url']}\nInhalt: {r['body']} "
+            f"Titel: {r['title']}\nURL: {r['href']}\nInhalt: {r['body']} "
             for r in result
         )
 
