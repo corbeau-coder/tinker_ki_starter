@@ -53,7 +53,7 @@ class PigCommand(Command):
                 try:
                     response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
                     while response.message.tool_calls is not None:
-                        logging.warning(f"toolaufruf {response.message.tool_calls[0].function.name} {response.message.tool_calls[0].arguments}")
+                        logging.warning(f"toolaufruf {response.message.tool_calls[0].function.name} {response.message.tool_calls[0].function.arguments}")
                         call = response.message.tool_calls[0]
                         tool_fn = tools[call.function.name]
                         result = tool_fn(**call.function.arguments)
