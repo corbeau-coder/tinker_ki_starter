@@ -53,7 +53,7 @@ class PigCommand(Command):
                 try:
                     response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
                     while response.message.tool_calls is not None:
-                        logging.warning(f"toolaufruf {response.message.tool_calls[0].function.name}")
+                        logging.warning(f"toolaufruf {response.message.tool_calls[0].function.name} {response.message.tool_calls[0].arguments}")
                         call = response.message.tool_calls[0]
                         tool_fn = tools[call.function.name]
                         result = tool_fn(**call.function.arguments)
@@ -74,7 +74,10 @@ class PigCommand(Command):
     def web_search(query: str) -> str:
         """Sucht nach aktuellen Informationen im Web mit DuckDuckGo
         Nutze dieses Tool, wenn du unsicher bist oder der Nutzer
-        nach Informationen fragst, die du nicht sicher kennst
+        nach Informationen fragst, die du nicht sicher kennst.
+        Sei dir den klassischen Problemen mit Suchmaschinen-APIs bewusst, insbesondere
+        wie sie klassisch filtern - du bekommst nur 5 Ergebnisse zurück und solltest mithilfe der
+        Suchanfrage eingrenzen, was du sehen willst.
         Args:
             query: Die Suchanfrage als String
 
