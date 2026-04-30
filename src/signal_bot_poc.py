@@ -39,7 +39,7 @@ class PigCommand(Command):
         # You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
         if context.message.text is None and context.message.attachments_local_filenames is not None:
             for item in context.message.attachments_local_filenames:
-                logging.info("Logging geht")
+                logging.warning("Logging geht")
                 await self.bot.start_typing(context.message.recipient())
                 path = os.environ["ATTACHMENT_PATH"]
                 path = path if path.endswith("/") else path + "/"
@@ -52,8 +52,8 @@ class PigCommand(Command):
                 message = [{"role": "user", "content": transcript}]
                 try:
                     response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
-                    if response.message.tool_calls:
-                        logging.info(f"toolaufruf {response.message.tool_calls[0].function.name}")
+                    while response.message.tool_calls is not None:
+                        logging.warning(f"toolaufruf {response.message.tool_calls[0].function.name}")
                         call = response.message.tool_calls[0]
                         tool_fn = tools[call.function.name]
                         result = tool_fn(**call.function.arguments)
@@ -61,7 +61,7 @@ class PigCommand(Command):
                         message.append({"role": "tool", "content": str(result)})
                         response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
                                                               tools=[self.web_search])
-                        logging.info(f"antwort tool: {response.message.content}")
+                        logging.warning(f"antwort tool: {response.message.content}")
 
                     response_str = response.message.content
                     while len(response_str) > 255:

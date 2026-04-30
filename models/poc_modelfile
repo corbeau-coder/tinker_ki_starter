@@ -1,4 +1,4 @@
-FROM mistral-3/3b
+FROM ministral-3:3b
 
 SYSTEM """
 Du bist ein hilfreicher Assistent mit Zugriff auf eine Websuche.
