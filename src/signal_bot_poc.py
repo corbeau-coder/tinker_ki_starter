@@ -63,12 +63,14 @@ class PigCommand(Command):
                         message.append({"role": "tool", "content": str(result)})
                         response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
                                                               tools=[self.web_search])
-                        logging.warning(f"antwort tool: {response.message.content}")
+                        logging.warning(f"antwort tool: {response.message.content} menge an toolwünschen {len(response.message.tool_calls) if response.message.tool_calls else 0}")
 
                     response_str = response.message.content
+                    logging.warning(f"versenden jetzt {len(response_str)}")
                     while len(response_str) > 255:
                         await context.send(response_str[:255])
                         response_str = response_str[255:]
+                    await context.send(response_str)
                 finally:
                     await self.bot.stop_typing(context.message.recipient())
 
