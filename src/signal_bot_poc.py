@@ -4,12 +4,14 @@
 
 import logging
 import os
+import datetime as dt
 
 from dotenv import load_dotenv
 from faster_whisper import WhisperModel
 from ollama import AsyncClient
 from ddgs import DDGS
 from pathlib import Path
+
 
 from signalbot import (
     Command,
@@ -49,7 +51,7 @@ class PigCommand(Command):
                     transcript = transcript + segment.text
                     await context.send(segment.text)
 
-                message = [{"role": "user", "content": transcript}]
+                message = [{"role": "system", "content": f"Das heutige Datum ist {dt.date.today().strftime('%d.%m.%Y')}"},{"role": "user", "content": transcript}]
                 try:
                     response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
                     while response.message.tool_calls is not None:
