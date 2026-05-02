@@ -66,10 +66,6 @@ class PigCommand(Command):
                         logging.warning(f"antwort tool: {response.message.content} menge an toolwünschen {len(response.message.tool_calls) if response.message.tool_calls else 0}")
 
                     response_str = response.message.content
-                    logging.warning(f"versenden jetzt {len(response_str)}")
-                    while len(response_str) > 255:
-                        await context.send(response_str[:255])
-                        response_str = response_str[255:]
                     await context.send(response_str)
                 finally:
                     await self.bot.stop_typing(context.message.recipient())

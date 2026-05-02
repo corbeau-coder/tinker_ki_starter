@@ -25,3 +25,10 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 * [ ] build 5 artifical requests the agents should "solve"
 * [ ] implement first version including instrumentation - remark: the pipeline object shell be DI-able
 * [ ] start/debug/analyze first version the 5 requests
+
+### open questions:
+* is ollama the right tool without own mcp support?
+* how to change models for testing/comparison?
+
+### technical debt
+* langfuse pinned to v2 (maneuvor around clickhouse for getting started)
