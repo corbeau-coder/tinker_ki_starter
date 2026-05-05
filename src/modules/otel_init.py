@@ -19,7 +19,7 @@ def init_telemetry(service_name: str) -> trace.Tracer:
     trace_provider = TracerProvider(resource=resource)
     trace_provider.add_span_processor(
         BatchSpanProcessor(
-            OTLPSpanExporter(endpoint=OTEL_ENDPOINT, insecure=True)
+            OTLPSpanExporter(endpoint=OTEL_ENDPOINT)
         )
     )
     trace.set_tracer_provider(trace_provider)
@@ -27,7 +27,7 @@ def init_telemetry(service_name: str) -> trace.Tracer:
     log_provider = LoggerProvider(resource=resource)
     log_provider.add_log_record_processor(
         BatchLogRecordProcessor(
-            OTLPLogExporter(endpoint=OTEL_ENDPOINT, insecure=True)
+            OTLPLogExporter(endpoint=OTEL_ENDPOINT)
         )
     )
     set_logger_provider(log_provider)
