@@ -1,31 +1,4 @@
 services:
-  langfuse-db:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: ${POSTGRES_USR}
-      POSTGRES_PASSWORD: ${POSTGRES_PWD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - langfuse_db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USR}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  langfuse:
-    image: langfuse/langfuse:2
-    depends_on:
-      langfuse-db:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USR}:${POSTGRES_PWD}@langfuse-db/${POSTGRES_DB}
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
-      NEXTAUTH_URL: ${NEXTAUTH_URL}
-      SALT: ${SALT}
-    ports:
-      - "3000:3000" #adjust to NEXTAUTH_URL
-
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -40,25 +13,13 @@ services:
     image: otel/opentelemetry-collector-contrib:latest
     depends_on:
       - prometheus
-      - langfuse
+      - langfuse-web
     volumes:
       - ./otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
     ports:
       - "4317:4317"
       - "4318:4318"
       - "8889:8889"
-
-  signal-api:
-    image: bbernhard/signal-cli-rest-api:latest
-    container_name: signal-api
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    volumes:
-      - .config:/home/.local/share/signal-cli
-    environment:
-      - MODE=json-rpc
-      #- MODE=normal
 
 volumes:
   prom_data:
