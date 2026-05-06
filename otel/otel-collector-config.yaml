@@ -15,8 +15,8 @@ exporters:
   prometheus:
     endpoint: 0.0.0.0:8889
 
-  otlphttp/langfuse:
-    endpoint: http://langfuse:3000/api/public/otel
+  otlp_http/langfuse:
+    endpoint: http://langfuse-web:3000/api/public/otel
     headers:
       Authorization: Basic ${LANGFUSE_AUTH}
 
