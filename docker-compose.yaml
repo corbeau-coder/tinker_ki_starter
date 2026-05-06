@@ -2,7 +2,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ~/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ~/tinker_ki_starter/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prom_data:/prometheus
     ports:
       - "9092:9090"
@@ -17,7 +17,7 @@ services:
     environment:
       LANGFUSE_AUTH: ${LANGFUSE_AUTH}
     volumes:
-      - ~/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+      - ~/tinker_ki_starter/otel/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
     ports:
       - "4317:4317"
       - "4318:4318"
