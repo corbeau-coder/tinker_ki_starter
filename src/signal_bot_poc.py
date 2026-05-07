@@ -47,12 +47,12 @@ class PigCommand(Command):
             with self.tracer.start_as_current_span("INCOMING_MESSAGE") as span:
                 for item in context.message.attachments_local_filenames:
                     logger.debug(f"taking {item} from stack start working on")
+                    span.set_attribute("processed file", item)
                     await self.bot.start_typing(context.message.recipient())
                     path = os.environ["ATTACHMENT_PATH"]
                     path = path if path.endswith("/") else path + "/"
-                    logger.debug(f"opening {path}")
                     with self.tracer.start_as_current_span("CREATE_TRANSCRIPT") as span:
-                        span.set_attribute("audio.file_path", path)
+                        span.set_attribute("audio.file_path", path+item)
                         try:
                             segments, info = self.model.transcribe(path + item, language="de")
                         except IOError as e:
@@ -61,10 +61,12 @@ class PigCommand(Command):
                             span.record_exception(e)
                             raise
                         logger.debug(f"info {info}")
+                        span.set_attribute("transcription.info", info)
                         transcript = ""
                         for segment in segments:
                             transcript = transcript + segment.text
                         logger.info(f"transcripted command is {transcript}")
+                        span.set_attribute("transcription.text", transcript)
                         await context.send(transcript)
 
                     with self.tracer.start_as_current_span("LLM_OPERATIONS") as span:
@@ -72,20 +74,30 @@ class PigCommand(Command):
                         message = [{"role": "system", "content": f"Das heutige Datum ist {dt.date.today().strftime('%d.%m.%Y')}"},{"role": "user", "content": transcript}]
                         try:
                             logger.debug(f"starting llm with following prompt message: {message}")
+                            span.set_attribute("llm.prompt", message)
                             response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
                             logger.debug(f"LLM response: {response.message.content}")
+                            span.set_attribute("llm.response", response.message.content if response.message.content else "")
                             while response.message.tool_calls is not None:
+                                span.set_attribute("llm.tool_call_requests",
+                                                   len(response.message.tool_calls) if response.message.tool_calls else 0)
                                 logger.debug(f"tools called: {response.message.tool_calls[0].function.name} {response.message.tool_calls[0].function.arguments}")
+                                span.set_attribute("tool_calls.name", response.message.tool_calls[0].function.name)
+                                span.set_attribute("tool_calls.arguments", response.message.tool_calls[0].function.arguments)
                                 call = response.message.tool_calls[0]
                                 tool_fn = tools[call.function.name]
                                 result = tool_fn(**call.function.arguments)
                                 logger.debug(f"tool call result: {result}")
+                                span.set_attribute("tool_calls.result", result)
                                 message.append(response.message)
                                 message.append({"role": "tool", "content": str(result)})
                                 logger.debug(f"starting llm with following prompt message including tool response: {message}")
+                                span.set_attribute("llm.prompt", message)
                                 response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
                                                                       tools=[self.web_search])
                                 logger.debug(f"LLM response: {response.message.content} amount of tool call requests: {len(response.message.tool_calls) if response.message.tool_calls else 0}")
+                                span.set_attribute("llm.response", response.message.content if response.message.content else "")
+                                span.set_attribute("llm.tool_call_requests", len(response.message.tool_calls) if response.message.tool_calls else 0)
 
                             response_str = response.message.content
                             await context.send(response_str)
