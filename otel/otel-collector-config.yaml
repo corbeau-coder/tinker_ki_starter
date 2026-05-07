@@ -21,6 +21,9 @@ exporters:
       Authorization: Basic ${LANGFUSE_AUTH}
 
 service:
+  telemetry:
+    logs:
+      level: debug
   pipelines:
     traces:
       receivers: [otlp]
