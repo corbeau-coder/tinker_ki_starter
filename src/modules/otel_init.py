@@ -11,7 +11,7 @@ from opentelemetry.sdk._logs import LoggerProvider, LoggingHandler
 from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
 
-OTEL_ENDPOINT = "http://localhost:4318"
+OTEL_ENDPOINT = "http://127.0.0.1:4318"
 
 def init_telemetry(service_name: str) -> trace.Tracer:
     resource = Resource.create({"service.name": service_name})
