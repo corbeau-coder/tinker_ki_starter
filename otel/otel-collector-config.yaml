@@ -12,6 +12,8 @@ processors:
     send_batch_size: 1000
 
 exporters:
+  debug:
+    verbosity: detailed
   prometheus:
     endpoint: 0.0.0.0:8889
 
@@ -28,7 +30,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp_http/langfuse]
+      exporters: [debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
