@@ -23,8 +23,6 @@ services:
       - "4318:4318"
       - "8888:8888"
       - "8889:8889"
-    command:
-      - '--set=service.telemetry.logs.level=debug'
 
 volumes:
   prom_data:
