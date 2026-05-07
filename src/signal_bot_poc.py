@@ -61,7 +61,9 @@ class PigCommand(Command):
                             span.record_exception(e)
                             raise
                         logger.debug(f"info {info}")
-                        span.set_attribute("transcription.info", info)
+                        span.set_attribute("transcription.info.language", info.language)
+                        span.set_attribute("transcription.info.duration", info.duration)
+                        span.set_attribute("transcription.info.language_probability", info.language_probability)
                         transcript = ""
                         for segment in segments:
                             transcript = transcript + segment.text
