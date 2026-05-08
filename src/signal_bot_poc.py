@@ -6,6 +6,7 @@ from loguru import logger
 import logging
 import os
 import datetime as dt
+import json
 
 from dotenv import load_dotenv
 from faster_whisper import WhisperModel
@@ -44,15 +45,16 @@ class PigCommand(Command):
 
         # You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
         if context.message.text is None and context.message.attachments_local_filenames is not None:
-            with self.tracer.start_as_current_span("INCOMING_MESSAGE") as span:
+            with (self.tracer.start_as_current_span("INCOMING_MESSAGE") as span):
                 for item in context.message.attachments_local_filenames:
-                    logger.debug(f"taking {item} from stack start working on")
-                    span.set_attribute("processed file", item)
                     await self.bot.start_typing(context.message.recipient())
-                    path = os.environ["ATTACHMENT_PATH"]
-                    path = path if path.endswith("/") else path + "/"
+                    span.add_event("loading file from stack")
                     with self.tracer.start_as_current_span("CREATE_TRANSCRIPT") as span:
-                        span.set_attribute("audio.file_path", path+item)
+                        path = os.environ["ATTACHMENT_PATH"]
+                        path = path if path.endswith("/") else path + "/"
+                        logger.debug(f"taking {item} from stack start working on")
+                        span.set_attribute("audiofile.name", item)
+                        span.set_attribute( "audiofile.path", path)
                         try:
                             segments, info = self.model.transcribe(path + item, language="de")
                         except IOError as e:
@@ -76,30 +78,47 @@ class PigCommand(Command):
                         message = [{"role": "system", "content": f"Das heutige Datum ist {dt.date.today().strftime('%d.%m.%Y')}"},{"role": "user", "content": transcript}]
                         try:
                             logger.debug(f"starting llm with following prompt message: {message}")
-                            span.set_attribute("llm.prompt", message)
+                            span.add_event("llm.START", attributes={
+                                "llm.prompt": json.dumps(message),
+                                "llm.tools": json.dumps(tools)
+                            })
+
                             response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
                             logger.debug(f"LLM response: {response.message.content}")
-                            span.set_attribute("llm.response", response.message.content if response.message.content else "")
+                            span.add_event("llm.RESPONSE", attributes={
+                                "llm.response": json.dumps(response.message.content if response.message.content else "")
+                            })
+
                             while response.message.tool_calls is not None:
-                                span.set_attribute("llm.tool_call_requests",
-                                                   len(response.message.tool_calls) if response.message.tool_calls else 0)
-                                logger.debug(f"tools called: {response.message.tool_calls[0].function.name} {response.message.tool_calls[0].function.arguments}")
-                                span.set_attribute("tool_calls.name", response.message.tool_calls[0].function.name)
-                                span.set_attribute("tool_calls.arguments", response.message.tool_calls[0].function.arguments)
+                                span.add_event("llm.TOOL_CALL_CYCLE_START", attributes={
+                                    "llm.tool_calls.amount": len(
+                                        response.message.tool_calls) if response.message.tool_calls else 0,
+                                    "llm.tool_calls.list": json.dumps(
+                                        response.message.tool_calls if response.message.tool_calls else []),
+                                    "llm.tool_call.names": response.message.tool_calls[0].function.name,
+                                    "llm.tool_call.arguments": json.dumps(response.message.tool_calls[0].function.arguments),
+                                })
                                 call = response.message.tool_calls[0]
                                 tool_fn = tools[call.function.name]
                                 result = tool_fn(**call.function.arguments)
                                 logger.debug(f"tool call result: {result}")
-                                span.set_attribute("tool_calls.result", result)
+                                span.add_event("llm.TOOL_CALL_CYCLE_RESULTS", attributes={
+                                    "llm.tool_calls.result": result
+                                })
                                 message.append(response.message)
                                 message.append({"role": "tool", "content": str(result)})
                                 logger.debug(f"starting llm with following prompt message including tool response: {message}")
-                                span.set_attribute("llm.prompt", message)
+                                span.add_event("llm.TOOL_CALL_CYCLE_LLM_RESPONSE", attributes={
+                                    "llm.prompt": json.dumps(message),
+
+                                })
                                 response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
                                                                       tools=[self.web_search])
                                 logger.debug(f"LLM response: {response.message.content} amount of tool call requests: {len(response.message.tool_calls) if response.message.tool_calls else 0}")
-                                span.set_attribute("llm.response", response.message.content if response.message.content else "")
-                                span.set_attribute("llm.tool_call_requests", len(response.message.tool_calls) if response.message.tool_calls else 0)
+                                span.add_event("llm..TOOL_CALL_CYCLE_END", attributes={
+                                    "llm.response": json.dumps(response.message.content if response.message.content else "")
+                                })
+
 
                             response_str = response.message.content
                             await context.send(response_str)
