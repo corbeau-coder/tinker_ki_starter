@@ -80,7 +80,7 @@ class PigCommand(Command):
                             logger.debug(f"starting llm with following prompt message: {message}")
                             span.add_event("llm.START", attributes={
                                 "llm.prompt": json.dumps(message),
-                                "llm.tools": json.dumps(tools)
+                                "llm.tools": json.dumps(list(tools.keys()))
                             })
 
                             response = await self.asynclient.chat(model="assi1", messages=message, stream=False, tools=list(tools.values()))
