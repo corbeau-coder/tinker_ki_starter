@@ -93,10 +93,10 @@ class PigCommand(Command):
                                 span.add_event("llm.TOOL_CALL_CYCLE_START", attributes={
                                     "llm.tool_calls.amount": len(
                                         response.message.tool_calls) if response.message.tool_calls else 0,
-                                    "llm.tool_calls.list": json.dumps(
-                                        response.message.tool_calls if response.message.tool_calls else []),
+                                    "llm.tool_calls.list": json.dumps(list(
+                                        response.message.tool_calls if response.message.tool_calls else [])),
                                     "llm.tool_call.names": response.message.tool_calls[0].function.name,
-                                    "llm.tool_call.arguments": json.dumps(response.message.tool_calls[0].function.arguments),
+                                    "llm.tool_call.arguments": response.message.tool_calls[0].function.arguments,
                                 })
                                 call = response.message.tool_calls[0]
                                 tool_fn = tools[call.function.name]
