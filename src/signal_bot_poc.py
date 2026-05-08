@@ -38,6 +38,12 @@ class PigCommand(Command):
         self.asynclient = AsyncClient()
         self.tracer = get_tracer("tinker_one")
 
+    @staticmethod
+    def _serialize_message(m):
+        if isinstance(m, dict):
+            return m
+        return m.model_dump()
+
     async def handle(self, context: Context) -> None:
         tools = {
             "web_search": self.web_search
@@ -93,10 +99,10 @@ class PigCommand(Command):
                                 span.add_event("llm.TOOL_CALL_CYCLE_START", attributes={
                                     "llm.tool_calls.amount": len(
                                         response.message.tool_calls) if response.message.tool_calls else 0,
-                                    "llm.tool_calls.list": json.dumps(list(
-                                        response.message.tool_calls if response.message.tool_calls else [])),
+                                    "llm.tool_calls.list": (json.dumps([
+                                        tc.model_dump() for tc in response.message.tool_calls])),
                                     "llm.tool_call.names": response.message.tool_calls[0].function.name,
-                                    "llm.tool_call.arguments": response.message.tool_calls[0].function.arguments,
+                                    "llm.tool_call.arguments": json.dumps(dict(response.message.tool_calls[0].function.arguments)),
                                 })
                                 call = response.message.tool_calls[0]
                                 tool_fn = tools[call.function.name]
@@ -109,13 +115,12 @@ class PigCommand(Command):
                                 message.append({"role": "tool", "content": str(result)})
                                 logger.debug(f"starting llm with following prompt message including tool response: {message}")
                                 span.add_event("llm.TOOL_CALL_CYCLE_LLM_RESPONSE", attributes={
-                                    "llm.prompt": json.dumps(message),
-
+                                    "llm.prompt": json.dumps([self._serialize_message(m) for m in message]),
                                 })
                                 response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
                                                                       tools=[self.web_search])
                                 logger.debug(f"LLM response: {response.message.content} amount of tool call requests: {len(response.message.tool_calls) if response.message.tool_calls else 0}")
-                                span.add_event("llm..TOOL_CALL_CYCLE_END", attributes={
+                                span.add_event("llm.TOOL_CALL_CYCLE_END", attributes={
                                     "llm.response": json.dumps(response.message.content if response.message.content else "")
                                 })
 
