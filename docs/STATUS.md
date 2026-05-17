@@ -13,6 +13,7 @@ create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 * how to fix absolute paths for prometheus and otel-config due to docker compose start up?
 * how to offloading tool building to cloud-based models? ADR?!?
 * missing ADR: how to implement token monitoring?
+* events not working on langfuse
 
 ### Last Session:
 * set up langfuse and prometheus using otel-con (but not tested e2e)

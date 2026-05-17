@@ -15,6 +15,7 @@ from ddgs import DDGS
 from pathlib import Path
 
 from opentelemetry.trace import get_tracer, Status, StatusCode
+from opentelemetry.baggage import set_baggage
 from modules.otel_init import init_telemetry
 
 from signalbot import (
@@ -49,9 +50,14 @@ class PigCommand(Command):
             "web_search": self.web_search
         }
 
+        ctx = set_baggage("langfuse.user.id", context.message.source_uuid)
+        ctx = set_baggage("langfuse.session.id", 1337, context=ctx)
+        ctx = set_baggage("langfuse.release", "0.0.1", context=ctx)
+
+
         # You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
         if context.message.text is None and context.message.attachments_local_filenames is not None:
-            with (self.tracer.start_as_current_span("INCOMING_MESSAGE") as span):
+            with (self.tracer.start_as_current_span("INCOMING_MESSAGE", context=ctx) as span):
                 for item in context.message.attachments_local_filenames:
                     await self.bot.start_typing(context.message.recipient())
                     span.add_event("loading file from stack")

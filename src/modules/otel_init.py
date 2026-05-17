@@ -4,6 +4,7 @@ import sys
 from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.processor.baggage import BaggageSpanProcessor, ALLOW_ALL_BAGGAGE_KEYS
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry._logs import set_logger_provider
@@ -23,6 +24,11 @@ def init_telemetry(service_name: str) -> trace.Tracer:
 
         )
     )
+    trace_provider.add_span_processor(
+        BagggeSpanProcessor(
+            ALLOW_ALL_BAGGAGE_KEYS
+        )
+    )
     trace.set_tracer_provider(trace_provider)
 
     log_provider = LoggerProvider(resource=resource)
@@ -36,6 +42,6 @@ def init_telemetry(service_name: str) -> trace.Tracer:
     handler = LoggingHandler()
     logger.remove()
     logger.add(sink=sys.stderr, level="DEBUG")
-    logger.add(sink=handler, format="{message}", level="DEBUG")
+    #logger.add(sink=handler, format="{message}", level="DEBUG")
 
     return trace.get_tracer(service_name)
