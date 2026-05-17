@@ -25,7 +25,7 @@ def init_telemetry(service_name: str) -> trace.Tracer:
         )
     )
     trace_provider.add_span_processor(
-        BagggeSpanProcessor(
+        BaggageSpanProcessor(
             ALLOW_ALL_BAGGAGE_KEYS
         )
     )
