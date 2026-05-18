@@ -106,6 +106,7 @@ class PigCommand(Command):
                                 span.set_attribute("llm.tool_calls.list", (json.dumps([
                                     tc.model_dump() for tc in response.message.tool_calls])))
                                 while response.message.tool_calls is not None:
+                                    message.append(response.message)
                                     for tool in response.message.tool_calls:
                                         with self.tracer.start_as_current_span("llm.TOOL_CALL_CYCLE_START") as span:
                                             span.set_attribute("llm.tool_call.name", tool.function.name)
@@ -119,7 +120,6 @@ class PigCommand(Command):
                                             logger.debug(f"tool call result: {result}")
                                             span.set_attribute("llm.tool_calls.result", result)
 
-                                        message.append(response.message)
                                         message.append({"role": "tool", "content": str(result)})
 
                                     logger.debug(f"starting llm with following prompt message including tool response: {message}")
