@@ -21,7 +21,7 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 ### Steps
 * [x] finalize container drawing in ARCHITECTURE.md
 * [x] check for fitting model with MCP capability
-* [ ] create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
+* [x] create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 * [ ] build 5 artifical requests the agents should "solve"
 * [ ] implement first version including instrumentation - remark: the pipeline object shell be DI-able
 * [ ] start/debug/analyze first version the 5 requests
@@ -31,4 +31,4 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 * how to change models for testing/comparison?
 
 ### technical debt
-* langfuse pinned to v2 (maneuvor around clickhouse for getting started)
+* ollama has to be replaced with llama.cpp for python

@@ -2,8 +2,7 @@
 create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 
 ### Next:
-* create python test testing langfuse and prometheus
-* check https://langfuse.com/integrations/native/opentelemetry#propagating-attributes
+ADR Session / solving open questions
 
 ### Blocked:
 
@@ -14,7 +13,9 @@ create OTel environment (set up OTel colletor docker, LangFuse and Prometheus)
 * how to offloading tool building to cloud-based models? ADR?!?
 * missing ADR: how to implement token monitoring?
 * events not working on langfuse
+* ADR session needed - implementation should work with both, cloud and local setup
 
 ### Last Session:
 * set up langfuse and prometheus using otel-con (but not tested e2e)
 * imported signalbot into project dir
+* added baggage
