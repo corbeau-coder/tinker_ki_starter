@@ -121,15 +121,16 @@ class PigCommand(Command):
 
                                         message.append(response.message)
                                         message.append({"role": "tool", "content": str(result)})
-                                        logger.debug(f"starting llm with following prompt message including tool response: {message}")
 
-                                        with self.tracer.start_as_current_span("llm.TOOL_CALL_CYCLE_LLM_RESPONSE") as span:
-                                            span.set_attribute("llm.prompt", json.dumps([self._serialize_message(m) for m in message]))
-                                            response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
-                                                              tools=[self.web_search])
-                                            logger.debug(f"LLM response: {response.message.content} amount of tool call requests: {len(response.message.tool_calls) if response.message.tool_calls else 0}")
-                                            span.set_attribute("llm.response", json.dumps(
-                                                response.message.content if response.message.content else ""))
+                                    logger.debug(f"starting llm with following prompt message including tool response: {message}")
+
+                                    with self.tracer.start_as_current_span("llm.TOOL_CALL_CYCLE_LLM_RESPONSE") as span:
+                                        span.set_attribute("llm.prompt", json.dumps([self._serialize_message(m) for m in message]))
+                                        response = await self.asynclient.chat(model="assi1", messages=message, stream=False,
+                                                          tools=[self.web_search])
+                                        logger.debug(f"LLM response: {response.message.content} amount of tool call requests: {len(response.message.tool_calls) if response.message.tool_calls else 0}")
+                                        span.set_attribute("llm.response", json.dumps(
+                                            response.message.content if response.message.content else ""))
 
                             response_str = response.message.content
                             llm_span.set_attribute("llm.output", response_str or "")
