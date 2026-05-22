@@ -29,6 +29,7 @@ The purpose is AI should serve as the best servant it can be - knowing everythin
 ### open questions:
 * is ollama the right tool without own mcp support?
 * how to change models for testing/comparison?
+* do not forget to integrate token cost tracking
 
 ### technical debt
 * ollama has to be replaced with llama.cpp for python
